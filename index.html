@@ -87,7 +87,23 @@
     </section>
   </main>
 
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
   <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "5ec3ed2e24a54c27aa9d2acd6e354e15"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>
+                        
+
+  <script>
+    class InvalidInputError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "InvalidInputError";
+      }
+    }
+
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -95,11 +111,95 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      let isnum = /^\d+$/.test(firstNum);
+      let isnum2 = /^\d+$/.test(secondNum);
+      let msg;
+      try{
+        if( !isnum || !isnum2){
+          throw new InvalidInputError('Invalid Input');
+        }
+        msg = eval(`${firstNum} ${operator} ${secondNum}`);
+      } catch(error) {
+        if(error instanceof InvalidInputError){
+          alert(error.name, error.message);
+          console.error('invalid input');
+          msg = 'Please enter a valid number';
+        }
+      } finally{
+        output.innerHTML = msg;
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
-
+    errorBtns[0].addEventListener('click', () => {
+      console.log('Console Log');
+    });
+    errorBtns[1].addEventListener('click', () => {
+      console.error('Console Error');
+    });
+    errorBtns[2].addEventListener('click', () => {
+      console.count('Console Count');
+    });
+    errorBtns[3].addEventListener('click', () => {
+      console.warn('Console Warn');
+    });
+    errorBtns[4].addEventListener('click', () => {
+      const number = 4;
+      const errorMsg = "This number is not 2";
+      console.assert(number===2, {number, errorMsg});
+    });
+    errorBtns[5].addEventListener('click', () => {
+      console.clear();
+    });
+    errorBtns[6].addEventListener('click', () => {
+      console.dir(document.querySelector('form'));
+    });
+    errorBtns[7].addEventListener('click', () => {
+      console.dirxml(document.querySelector('form'));
+    });
+    errorBtns[8].addEventListener('click', () => {
+      console.group('Console Group 1');
+      console.log('layout');
+      console.log('layout');
+      console.log('layout');
+    });
+    errorBtns[9].addEventListener('click', ()=> {
+      console.groupEnd();
+    })
+    errorBtns[10].addEventListener('click', () => {
+      console.table([{
+        name: 'Ben',
+        age: 20,
+        school: 'UCSD'
+      }, {
+        name: 'Tom',
+        age: 21,
+        school: "UCLA"
+      }]);
+    });
+    errorBtns[11].addEventListener('click', () => {
+      console.time('Start Timer');
+    });
+    errorBtns[12].addEventListener('click', () => {
+      console.timeEnd('Start Timer');
+    });
+    errorBtns[13].addEventListener('click', () => {
+      //create some function calls
+      function deep(){
+        function deeper() {
+          function deepest() {
+            console.trace();
+          }
+          deepest();
+        }
+        deeper();
+      }
+      deep();
+    });
+    errorBtns[14].addEventListener('click', () => {
+      throw new Error('Trigger a Global Error');
+    });
+  
     // Start your code here
     // You may move this JS to another file if you wish
   </script>
